@@ -21,10 +21,13 @@ export default function Sidebar({ navItems, user, basePath }) {
     <aside style={{ width: 224, background: BEIGE, display: 'flex', flexDirection: 'column', flexShrink: 0, position: 'sticky', top: 0, height: '100vh', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
       {/* Logo */}
-      <div style={{ padding: '20px 18px 14px' }}>
-        <Image src="/logo-transparent.png" alt="Webtijger" width={130} height={48} style={{ objectFit: 'contain', objectPosition: 'left' }} />
-        <div style={{ color: '#8a7a66', fontSize: 10, letterSpacing: '0.8px', textTransform: 'uppercase', marginTop: 6 }}>
-          {basePath === '/admin' ? 'Beheerder' : 'Klantportaal'}
+      <div style={{ padding: '16px 18px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Image src="/mascotte.png" alt="Webtijger" width={38} height={38} style={{ objectFit: 'contain', flexShrink: 0 }} />
+        <div>
+          <div style={{ color: '#2a1f14', fontSize: 14, fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}>Webtijger</div>
+          <div style={{ color: '#8a7a66', fontSize: 10, letterSpacing: '0.8px', textTransform: 'uppercase', marginTop: 1 }}>
+            {basePath === '/admin' ? 'Beheerder' : 'Klantportaal'}
+          </div>
         </div>
       </div>
 
