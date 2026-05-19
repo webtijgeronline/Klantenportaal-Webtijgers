@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '../../components/Sidebar'
-import ChatBot from '../../components/ChatBot'
 
 const PORTAL_NAV = [
   { id: 'project', label: 'Mijn project' },
@@ -34,7 +33,6 @@ export default function PortalLayout({ children }) {
       <main style={{ flex: 1, minWidth: 0, overflowX: 'hidden' }}>
         {children}
       </main>
-      <ChatBot userName={user.name} />
     </div>
   )
 }
