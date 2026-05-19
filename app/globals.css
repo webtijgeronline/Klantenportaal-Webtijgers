@@ -1,18 +1,18 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
-  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
   background: #faf9f7;
   color: #111;
   -webkit-font-smoothing: antialiased;
 }
 
 input, textarea, select, button {
-  font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+  font-family: 'Poppins', -apple-system, sans-serif;
 }
 
 ::-webkit-scrollbar { width: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #d1c3aa; border-radius: 99px; }
+::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 99px; }

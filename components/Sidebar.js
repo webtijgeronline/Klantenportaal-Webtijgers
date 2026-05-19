@@ -5,7 +5,6 @@ import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 
 const ORANGE = '#f97316'
-const BEIGE = '#d1c3aa'
 
 export default function Sidebar({ navItems, user, basePath }) {
   const pathname = usePathname()
@@ -18,20 +17,30 @@ export default function Sidebar({ navItems, user, basePath }) {
   }
 
   return (
-    <aside style={{ width: 224, background: BEIGE, display: 'flex', flexDirection: 'column', flexShrink: 0, position: 'sticky', top: 0, height: '100vh', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+    <aside style={{
+      width: 224,
+      background: 'linear-gradient(180deg, #1a1a1a 0%, #111111 100%)',
+      display: 'flex', flexDirection: 'column', flexShrink: 0,
+      position: 'sticky', top: 0, height: '100vh',
+      fontFamily: "'Poppins', sans-serif",
+      borderRight: '1px solid #2a2a2a'
+    }}>
 
-      {/* Logo */}
-      <div style={{ padding: '16px 18px 12px', display: 'flex', alignItems: 'center', gap: 10 }}>
-        <Image src="/mascotte.png" alt="Webtijger" width={38} height={38} style={{ objectFit: 'contain', flexShrink: 0 }} />
+      {/* Logo — mascotte + naam */}
+      <div style={{ padding: '18px 16px 14px', display: 'flex', alignItems: 'center', gap: 10 }}>
+        <div style={{ width: 36, height: 36, flexShrink: 0, position: 'relative' }}>
+          <img src="/mascotte.png" alt="Webtijger" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+        </div>
         <div>
-          <div style={{ color: '#2a1f14', fontSize: 14, fontWeight: 800, letterSpacing: '-0.3px', lineHeight: 1.2 }}>Webtijger</div>
-          <div style={{ color: '#8a7a66', fontSize: 10, letterSpacing: '0.8px', textTransform: 'uppercase', marginTop: 1 }}>
+          <div style={{ color: '#fff', fontSize: 14, fontWeight: 700, letterSpacing: '-0.2px', lineHeight: 1.2 }}>Webtijger</div>
+          <div style={{ color: '#555', fontSize: 10, letterSpacing: '0.6px', textTransform: 'uppercase', marginTop: 1 }}>
             {basePath === '/admin' ? 'Beheerder' : 'Klantportaal'}
           </div>
         </div>
       </div>
 
-      <div style={{ height: 1, background: '#c4b49a', margin: '0 0 6px' }} />
+      {/* Oranje divider */}
+      <div style={{ height: 2, background: `linear-gradient(90deg, ${ORANGE}, transparent)`, margin: '0 0 8px' }} />
 
       {/* Nav */}
       <nav style={{ flex: 1, padding: '4px 10px', overflowY: 'auto' }}>
@@ -43,9 +52,9 @@ export default function Sidebar({ navItems, user, basePath }) {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '8px 12px', borderRadius: 8, marginBottom: 2,
                 background: active ? ORANGE : 'transparent',
-                color: active ? '#ffffff' : '#5a4a38',
-                fontSize: 13.5, fontWeight: active ? 700 : 500,
-                textDecoration: 'none',
+                color: active ? '#ffffff' : '#888',
+                fontSize: 13, fontWeight: active ? 600 : 400,
+                textDecoration: 'none', letterSpacing: '0.1px',
               }}>
               {item.label}
               {item.badge > 0 && (
@@ -57,18 +66,18 @@ export default function Sidebar({ navItems, user, basePath }) {
       </nav>
 
       {/* User */}
-      <div style={{ padding: '12px 14px', borderTop: '1px solid #c4b49a' }}>
+      <div style={{ padding: '12px 14px', borderTop: '1px solid #222' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-          <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#c4b49a', border: '1.5px solid #b0a090', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#5a4a38', flexShrink: 0 }}>
+          <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#222', border: `1.5px solid ${ORANGE}40`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: ORANGE, flexShrink: 0 }}>
             {(user?.name || user?.email || 'U').slice(0, 1).toUpperCase()}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ color: '#2a1f14', fontSize: 12, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name || 'Gebruiker'}</div>
-            <div style={{ color: '#8a7a66', fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email || ''}</div>
+            <div style={{ color: '#e0e0e0', fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name || 'Gebruiker'}</div>
+            <div style={{ color: '#555', fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email || ''}</div>
           </div>
         </div>
         <button onClick={logout}
-          style={{ marginTop: 10, width: '100%', background: '#c4b49a', border: '1px solid #b0a090', cursor: 'pointer', color: '#5a4a38', fontSize: 12, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: '7px', borderRadius: 7, fontWeight: 600 }}>
+          style={{ marginTop: 10, width: '100%', background: '#1e1e1e', border: '1px solid #2a2a2a', cursor: 'pointer', color: '#666', fontSize: 12, fontFamily: "'Poppins', sans-serif", padding: '7px', borderRadius: 7, fontWeight: 500 }}>
           Uitloggen
         </button>
       </div>

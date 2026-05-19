@@ -35,31 +35,31 @@ export default function LoginPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#faf9f7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#faf9f7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', fontFamily: "'Poppins', -apple-system, sans-serif" }}>
       <div style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-        {/* Mascotte only */}
-        <Image
-          src="/mascotte.png"
-          alt="Webtijger"
-          width={150}
-          height={150}
-          style={{ objectFit: 'contain', filter: 'drop-shadow(0 8px 24px rgba(249,115,22,0.2))', marginBottom: '1.5rem' }}
-        />
+        {/* Mascotte — mix-blend-mode verwijdert zwarte achtergrond visueel */}
+        <div style={{ width: 160, height: 160, marginBottom: '1rem', position: 'relative' }}>
+          <img
+            src="/mascotte-login.png"
+            alt="Webtijger"
+            style={{ width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }}
+          />
+        </div>
 
         {/* Card */}
         <div style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 18, padding: '2rem', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
-          <h2 style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.5px', marginBottom: '0.25rem' }}>Welkom terug</h2>
+          <h2 style={{ fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.3px', marginBottom: '0.25rem' }}>Welkom terug</h2>
           <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>Log in op je persoonlijke portaal</p>
 
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem' }}>E-mailadres</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#374151', marginBottom: '0.4rem' }}>E-mailadres</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jouw@email.nl" required
                 style={{ width: '100%', padding: '0.7rem 0.9rem', background: '#faf9f7', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
             </div>
             <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem' }}>Wachtwoord</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 600, color: '#374151', marginBottom: '0.4rem' }}>Wachtwoord</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required
                 style={{ width: '100%', padding: '0.7rem 0.9rem', background: '#faf9f7', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
             </div>
@@ -71,7 +71,7 @@ export default function LoginPage() {
             )}
 
             <button type="submit" disabled={loading}
-              style={{ width: '100%', background: ORANGE, color: '#fff', border: 'none', padding: '0.8rem', borderRadius: 10, fontSize: '0.95rem', fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, fontFamily: 'inherit' }}>
+              style={{ width: '100%', background: ORANGE, color: '#fff', border: 'none', padding: '0.8rem', borderRadius: 10, fontSize: '0.95rem', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, fontFamily: 'inherit' }}>
               {loading ? 'Inloggen...' : 'Inloggen →'}
             </button>
           </form>
@@ -79,7 +79,7 @@ export default function LoginPage() {
 
         <p style={{ color: '#b0b0b0', fontSize: '0.8rem', marginTop: '1.25rem' }}>
           Geen account?{' '}
-          <a href="mailto:info@webtijger.nl" style={{ color: ORANGE, textDecoration: 'none', fontWeight: 700 }}>Mail ons</a>
+          <a href="mailto:info@webtijger.nl" style={{ color: ORANGE, textDecoration: 'none', fontWeight: 600 }}>Mail ons</a>
         </p>
       </div>
     </div>
