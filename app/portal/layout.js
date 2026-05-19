@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Sidebar from '../../components/Sidebar'
+import ChatBot from '../../components/ChatBot'
 
 const PORTAL_NAV = [
   { id: 'project', label: 'Mijn project' },
@@ -28,11 +29,12 @@ export default function PortalLayout({ children }) {
   if (!user) return null
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'DM Sans', sans-serif", background: '#f9fafb' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'DM Sans', sans-serif", background: '#faf9f7' }}>
       <Sidebar navItems={PORTAL_NAV} user={user} basePath="/portal" />
       <main style={{ flex: 1, minWidth: 0, overflowX: 'hidden' }}>
         {children}
       </main>
+      <ChatBot userName={user.name} />
     </div>
   )
 }
