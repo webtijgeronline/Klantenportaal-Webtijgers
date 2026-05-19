@@ -1,87 +1,119 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../../lib/supabase'
 
-const T = { ink: '#0a0a0a', muted: '#9ca3af', subtle: '#6b7280', border: '#e5e7eb', borderLight: '#f3f4f6', surface: '#fff', bg: '#f9fafb', blue: '#2563eb', green: '#16a34a', red: '#dc2626', amber: '#d97706', font: "'DM Sans', sans-serif" }
-const fStyle = { width: '100%', padding: '8px 11px', border: `1px solid ${T.border}`, borderRadius: 7, fontSize: 13, color: T.ink, outline: 'none', background: T.surface, boxSizing: 'border-box', fontFamily: T.font }
-const TICKET_SM = { open: { label: 'Open', color: T.red, bg: '#fef2f2', border: '#fecaca' }, in_progress: { label: 'In behandeling', color: T.amber, bg: '#fffbeb', border: '#fde68a' }, resolved: { label: 'Opgelost', color: T.green, bg: '#f0fdf4', border: '#bbf7d0' }, closed: { label: 'Gesloten', color: T.subtle, bg: T.bg, border: T.border } }
+const ORANGE = '#f97316'
+const statusColor = { 'open': '#ef4444', 'in_progress': ORANGE, 'resolved': '#22c55e', 'closed': '#9ca3af' }
+const statusLabel = { 'open': 'Open', 'in_progress': 'In behandeling', 'resolved': 'Opgelost', 'closed': 'Gesloten' }
+const priorityLabel = { 'low': 'Laag', 'medium': 'Normaal', 'high': 'Hoog', 'urgent': 'Urgent' }
 
 export default function PortalSupport() {
   const [tickets, setTickets] = useState([])
   const [loading, setLoading] = useState(true)
-  const [open, setOpen] = useState(false)
+  const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({ subject: '', message: '', priority: 'medium' })
-  const [saving, setSaving] = useState(false)
-  const [email, setEmail] = useState('')
-  const [name, setName] = useState('')
+  const [sending, setSending] = useState(false)
+  const [clientEmail, setClientEmail] = useState('')
 
   useEffect(() => {
-    const stored = localStorage.getItem('wt_user')
-    if (!stored) return
-    const u = JSON.parse(stored)
-    setEmail(u.email); setName(u.name)
-    supabase.from('support_tickets').select('*').eq('client_email', u.email).order('created_at', { ascending: false }).then(({ data }) => {
-      setTickets(data || []); setLoading(false)
-    })
+    const email = sessionStorage.getItem('clientEmail')
+    if (email) { setClientEmail(email); fetchTickets(email) }
+    else setLoading(false)
   }, [])
 
-  const submit = async () => {
-    if (!form.subject || !form.message) return
-    setSaving(true)
-    const { data } = await supabase.from('support_tickets').insert({ ...form, client_email: email, client_name: name, status: 'open' }).select().single()
-    if (data) setTickets(p => [data, ...p])
-    setForm({ subject: '', message: '', priority: 'medium' }); setOpen(false); setSaving(false)
+  async function fetchTickets(email) {
+    const { data } = await supabase.from('support_tickets').select('*').eq('client_email', email).order('created_at', { ascending: false })
+    setTickets(data || [])
+    setLoading(false)
   }
 
+  async function submit() {
+    if (!form.subject.trim() || !form.message.trim()) return
+    setSending(true)
+    await supabase.from('support_tickets').insert({ ...form, client_email: clientEmail, status: 'open' })
+    setForm({ subject: '', message: '', priority: 'medium' })
+    setShowForm(false)
+    fetchTickets(clientEmail)
+    setSending(false)
+  }
+
+  const inputStyle = { width: '100%', padding: '0.65rem 0.875rem', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 9, fontSize: '0.875rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }
+
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 22 }}>
-        <h2 style={{ margin: 0, fontSize: 18, fontWeight: 600, color: T.ink, letterSpacing: '-0.4px' }}>Support</h2>
-        <button onClick={() => setOpen(true)} style={{ padding: '8px 15px', background: T.ink, color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 500, cursor: 'pointer', fontFamily: T.font }}>Nieuw ticket</button>
+    <div style={{ padding: '2rem', maxWidth: 700 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.75rem' }}>
+        <div>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.5px', margin: 0 }}>Support</h1>
+          <p style={{ color: '#6b7280', marginTop: '0.3rem', fontSize: '0.95rem' }}>Krijg hulp bij jouw website of diensten.</p>
+        </div>
+        <button onClick={() => setShowForm(true)} style={{ background: ORANGE, color: '#fff', border: 'none', padding: '0.6rem 1.25rem', borderRadius: 9, fontWeight: 600, fontSize: '0.875rem', cursor: 'pointer', flexShrink: 0 }}>
+          + Nieuw verzoek
+        </button>
       </div>
 
-      {loading ? <div style={{ color: T.muted, fontSize: 13 }}>Laden...</div> : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          {tickets.map(t => {
-            const s = TICKET_SM[t.status] || TICKET_SM.open
-            return (
-              <div key={t.id} style={{ background: T.surface, borderRadius: 10, border: `1px solid ${T.border}`, padding: '16px 20px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, marginBottom: t.admin_reply ? 12 : 0 }}>
-                  <div>
-                    <div style={{ fontSize: 14, fontWeight: 600, color: T.ink, marginBottom: 3 }}>{t.subject}</div>
-                    <div style={{ fontSize: 11, color: T.muted, marginBottom: 6 }}>{new Date(t.created_at).toLocaleDateString('nl-NL')}</div>
-                    <div style={{ fontSize: 13, color: T.subtle }}>{t.message}</div>
-                  </div>
-                  <span style={{ display: 'inline-flex', alignItems: 'center', fontSize: 11, fontWeight: 500, color: s.color, background: s.bg, border: `1px solid ${s.border}`, borderRadius: 99, padding: '3px 9px', whiteSpace: 'nowrap', flexShrink: 0, height: 'fit-content' }}>{s.label}</span>
-                </div>
-                {t.admin_reply && (
-                  <div style={{ marginTop: 12, paddingTop: 12, borderTop: `1px solid ${T.borderLight}`, paddingLeft: 12, borderLeft: `2px solid ${T.blue}` }}>
-                    <div style={{ fontSize: 11, fontWeight: 500, color: T.blue, marginBottom: 4 }}>Reactie van Webtijger</div>
-                    <div style={{ fontSize: 13, color: T.subtle }}>{t.admin_reply}</div>
-                  </div>
-                )}
+      {/* New ticket modal */}
+      {showForm && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}>
+          <div style={{ background: '#fff', borderRadius: 16, padding: '1.75rem', width: '100%', maxWidth: 480, boxShadow: '0 20px 60px rgba(0,0,0,0.15)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <h2 style={{ fontWeight: 700, fontSize: '1.1rem' }}>Nieuw supportverzoek</h2>
+              <button onClick={() => setShowForm(false)} style={{ background: 'none', border: 'none', fontSize: 22, cursor: 'pointer', color: '#6b7280', lineHeight: 1 }}>×</button>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '0.4rem' }}>Onderwerp</label>
+                <input value={form.subject} onChange={e => setForm({ ...form, subject: e.target.value })} placeholder="Beschrijf je vraag kort" style={inputStyle} />
               </div>
-            )
-          })}
-          {tickets.length === 0 && <div style={{ padding: '36px 0', textAlign: 'center', fontSize: 13, color: T.muted }}>Je hebt nog geen tickets ingediend.</div>}
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '0.4rem' }}>Omschrijving</label>
+                <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} placeholder="Beschrijf jouw vraag of probleem..." rows={4} style={{ ...inputStyle, resize: 'vertical' }} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: '#374151', marginBottom: '0.4rem' }}>Prioriteit</label>
+                <select value={form.priority} onChange={e => setForm({ ...form, priority: e.target.value })} style={inputStyle}>
+                  <option value="low">Lage prioriteit</option>
+                  <option value="medium">Normale prioriteit</option>
+                  <option value="high">Hoge prioriteit</option>
+                </select>
+              </div>
+              <button onClick={submit} disabled={sending || !form.subject.trim()} style={{ background: ORANGE, color: '#fff', border: 'none', padding: '0.75rem', borderRadius: 9, fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', opacity: sending ? 0.7 : 1 }}>
+                {sending ? 'Versturen...' : 'Verzoek versturen'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
-      {open && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.3)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }} onClick={() => setOpen(false)}>
-          <div style={{ background: T.surface, borderRadius: 16, padding: '26px 26px 22px', width: '100%', maxWidth: 480, border: `1px solid ${T.border}` }} onClick={e => e.stopPropagation()}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
-              <span style={{ fontSize: 15, fontWeight: 600, color: T.ink }}>Nieuw support ticket</span>
-              <button onClick={() => setOpen(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: T.muted, fontSize: 20, fontFamily: T.font }}>×</button>
+      {loading ? <p style={{ color: '#6b7280' }}>Laden...</p> : tickets.length === 0 ? (
+        <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '3rem', textAlign: 'center' }}>
+          <p style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>💬</p>
+          <p style={{ fontWeight: 600, marginBottom: '0.25rem' }}>Geen openstaande tickets</p>
+          <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Heb je een vraag? Maak een nieuw verzoek aan.</p>
+        </div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {tickets.map(t => (
+            <div key={t.id} style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '1.25rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
+                <p style={{ fontWeight: 600, fontSize: '0.95rem' }}>{t.subject}</p>
+                <span style={{ background: (statusColor[t.status] || '#9ca3af') + '18', color: statusColor[t.status] || '#9ca3af', padding: '3px 10px', borderRadius: 999, fontSize: '0.75rem', fontWeight: 600, flexShrink: 0, marginLeft: '1rem' }}>
+                  {statusLabel[t.status] || t.status}
+                </span>
+              </div>
+              <p style={{ fontSize: '0.875rem', color: '#6b7280', lineHeight: 1.5, marginBottom: '0.75rem' }}>{t.message}</p>
+              <div style={{ display: 'flex', gap: '1rem', fontSize: '0.8rem', color: '#9ca3af' }}>
+                <span>{new Date(t.created_at).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                <span>·</span>
+                <span>{priorityLabel[t.priority] || t.priority} prioriteit</span>
+              </div>
+              {t.admin_note && (
+                <div style={{ marginTop: '0.875rem', background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: 9, padding: '0.75rem 1rem' }}>
+                  <p style={{ fontSize: '0.78rem', fontWeight: 700, color: ORANGE, marginBottom: '0.25rem' }}>Reactie van Webtijger</p>
+                  <p style={{ fontSize: '0.875rem', color: '#374151' }}>{t.admin_note}</p>
+                </div>
+              )}
             </div>
-            <div style={{ marginBottom: 13 }}><label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: T.subtle, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.3px' }}>Onderwerp</label><input value={form.subject} onChange={e => setForm({...form, subject: e.target.value})} style={fStyle} onFocus={e => e.target.style.borderColor = T.blue} onBlur={e => e.target.style.borderColor = T.border} /></div>
-            <div style={{ marginBottom: 13 }}><label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: T.subtle, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.3px' }}>Beschrijving</label><textarea value={form.message} onChange={e => setForm({...form, message: e.target.value})} rows={4} style={{ ...fStyle, resize: 'vertical', lineHeight: 1.6 }} onFocus={e => e.target.style.borderColor = T.blue} onBlur={e => e.target.style.borderColor = T.border} /></div>
-            <div style={{ marginBottom: 13 }}><label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: T.subtle, marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.3px' }}>Prioriteit</label><select value={form.priority} onChange={e => setForm({...form, priority: e.target.value})} style={{ ...fStyle, cursor: 'pointer' }}><option value="low">Laag</option><option value="medium">Normaal</option><option value="high">Urgent</option></select></div>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 6 }}>
-              <button onClick={() => setOpen(false)} style={{ padding: '8px 15px', background: T.surface, color: T.ink, border: `1px solid ${T.border}`, borderRadius: 7, fontSize: 13, cursor: 'pointer', fontFamily: T.font }}>Annuleren</button>
-              <button onClick={submit} disabled={saving || !form.subject || !form.message} style={{ padding: '8px 15px', background: T.ink, color: '#fff', border: 'none', borderRadius: 7, fontSize: 13, fontWeight: 500, cursor: 'pointer', opacity: saving ? 0.6 : 1, fontFamily: T.font }}>{saving ? 'Versturen...' : 'Versturen'}</button>
-            </div>
-          </div>
+          ))}
         </div>
       )}
     </div>

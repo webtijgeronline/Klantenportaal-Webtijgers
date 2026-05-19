@@ -30,7 +30,7 @@ export default function AdminLayout({ children }) {
   if (!user) return null
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'DM Sans', sans-serif", background: '#f9fafb' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'DM Sans', sans-serif", background: '#faf9f7' }}>
       <Sidebar navItems={ADMIN_NAV} user={user} basePath="/admin" />
       <main style={{ flex: 1, minWidth: 0, overflowX: 'hidden' }}>
         {children}

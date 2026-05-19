@@ -1,94 +1,120 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../../lib/supabase'
 
-const T = { ink: '#0a0a0a', muted: '#9ca3af', subtle: '#6b7280', border: '#e5e7eb', borderLight: '#f3f4f6', surface: '#fff', bg: '#f9fafb', blue: '#2563eb', green: '#16a34a' }
+const ORANGE = '#f97316'
+
+const SECTIONS = [
+  { key: 'logo_branding', label: 'Logo & Branding', desc: 'Logobestanden, huisstijl, kleurenpalet' },
+  { key: 'fotos', label: "Foto's", desc: 'Professionele foto\'s van jou, je team of product' },
+  { key: 'website_teksten', label: 'Website teksten', desc: 'Alle teksten: wie zijn wij, diensten, contact' },
+  { key: 'bedrijfsinformatie', label: 'Bedrijfsinformatie', desc: 'KVK, adres, telefoonnummer, openingstijden' },
+  { key: 'inspiratie', label: 'Inspiratie & Voorbeelden', desc: 'Websites die je mooi vindt, stijlreferenties' },
+  { key: 'documenten', label: 'Documenten', desc: 'Brochures, prijslijsten, certificaten' },
+  { key: 'website_bestanden', label: 'Website bestanden', desc: 'Bestaande bestanden van je oude website' },
+]
 
 export default function PortalAanleveren() {
-  const [aanleveren, setAanleveren] = useState(null)
+  const [record, setRecord] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(null)
 
   useEffect(() => {
-    const stored = localStorage.getItem('wt_user')
-    if (!stored) return
-    const { email } = JSON.parse(stored)
-    supabase.from('aanleveren').select('*').eq('client_email', email).single().then(({ data }) => {
-      setAanleveren(data)
-      setLoading(false)
-    })
+    const email = sessionStorage.getItem('clientEmail')
+    if (email) fetchRecord(email)
+    else setLoading(false)
   }, [])
 
-  const toggle = async (sectionId) => {
-    if (!aanleveren) return
-    const updated = { ...aanleveren, sections: aanleveren.sections.map(s => s.id === sectionId ? { ...s, done: !s.done } : s) }
-    setAanleveren(updated)
-    await supabase.from('aanleveren').update({ sections: updated.sections }).eq('id', aanleveren.id)
+  async function fetchRecord(email) {
+    const { data } = await supabase.from('aanleveren').select('*').eq('client_email', email).single()
+    setRecord(data || null)
+    setLoading(false)
   }
 
-  if (loading) return <div style={{ color: T.muted, fontSize: 13 }}>Laden...</div>
-  if (!aanleveren) return <div style={{ padding: '36px 0', textAlign: 'center', fontSize: 13, color: T.muted }}>Nog geen aanleveropdracht aangemaakt door Webtijger.</div>
+  async function toggle(key) {
+    if (!record) return
+    setSaving(key)
+    const newVal = !record[key]
+    await supabase.from('aanleveren').update({ [key]: newVal }).eq('id', record.id)
+    setRecord(r => ({ ...r, [key]: newVal }))
+    setSaving(null)
+  }
 
-  const done = aanleveren.sections.filter(s => s.done).length
-  const total = aanleveren.sections.length
-  const pct = Math.round((done / total) * 100)
-  const allDone = done === total
+  const done = record ? SECTIONS.filter(s => record[s.key]).length : 0
+  const pct = Math.round((done / SECTIONS.length) * 100)
 
   return (
-    <div>
-      <div style={{ marginBottom: 26 }}>
-        <h2 style={{ margin: '0 0 3px', fontSize: 19, fontWeight: 600, color: T.ink, letterSpacing: '-0.4px' }}>Aanleveren</h2>
-        <p style={{ margin: 0, fontSize: 13, color: T.muted }}>Lever de onderstaande bestanden en informatie aan voor jouw website.</p>
-      </div>
+    <div style={{ padding: '2rem', maxWidth: 700 }}>
+      <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.5px', margin: 0 }}>Aanleveren</h1>
+      <p style={{ color: '#6b7280', marginTop: '0.3rem', fontSize: '0.95rem', marginBottom: '1.75rem' }}>
+        Lever hier alle benodigde bestanden en informatie aan voor jouw website.
+      </p>
 
-      <div style={{ background: T.surface, borderRadius: 14, border: `1px solid ${T.border}`, padding: '20px 22px', marginBottom: 20 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <div>
-            <div style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>{allDone ? 'Alles aangeleverd!' : 'Voortgang aanleveren'}</div>
-            <div style={{ fontSize: 12, color: T.muted, marginTop: 2 }}>{done} van {total} onderdelen voltooid</div>
-          </div>
-          <div style={{ fontSize: 28, fontWeight: 600, color: allDone ? T.green : T.ink, letterSpacing: '-1px' }}>{pct}%</div>
+      {loading ? <p style={{ color: '#6b7280' }}>Laden...</p> : !record ? (
+        <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '2rem', textAlign: 'center', color: '#6b7280' }}>
+          Geen aanleveren-record gevonden. Neem contact op via <a href="mailto:info@webtijger.nl" style={{ color: ORANGE }}>info@webtijger.nl</a>
         </div>
-        <div style={{ height: 6, background: T.borderLight, borderRadius: 99, overflow: 'hidden' }}>
-          <div style={{ width: `${pct}%`, height: '100%', background: allDone ? T.green : T.blue, borderRadius: 99, transition: 'width 0.4s' }} />
-        </div>
-        {aanleveren.drive_folder && (
-          <div style={{ marginTop: 14, paddingTop: 14, borderTop: `1px solid ${T.borderLight}` }}>
-            <div style={{ fontSize: 12, color: T.muted, marginBottom: 6 }}>Jouw persoonlijke bestanden map:</div>
-            <a href={aanleveren.drive_folder} target="_blank" rel="noreferrer"
-              style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, color: T.blue, textDecoration: 'none', background: '#eff6ff', padding: '7px 14px', borderRadius: 7, border: '1px solid #bfdbfe', fontWeight: 500 }}>
-              Bestanden uploaden in Google Drive
-            </a>
-          </div>
-        )}
-      </div>
-
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-        {aanleveren.sections.map((s, i) => (
-          <div key={s.id} style={{ background: s.done ? '#fafffe' : T.surface, borderRadius: 10, border: `1px solid ${s.done ? '#bbf7d0' : T.border}`, padding: '16px 20px' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 14 }}>
-              <button onClick={() => toggle(s.id)}
-                style={{ width: 22, height: 22, borderRadius: '50%', border: `2px solid ${s.done ? T.green : T.border}`, background: s.done ? T.green : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0, marginTop: 2 }}>
-                {s.done && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-              </button>
-              <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: s.done ? T.subtle : T.ink, textDecoration: s.done ? 'line-through' : 'none' }}>
-                    {String(i + 1).padStart(2, '0')}. {s.label}
-                  </div>
-                  <span style={{ fontSize: 11, color: s.done ? T.green : T.muted, background: s.done ? '#f0fdf4' : T.bg, padding: '2px 8px', borderRadius: 99, border: `1px solid ${s.done ? '#bbf7d0' : T.borderLight}`, flexShrink: 0 }}>
-                    {s.done ? 'Aangeleverd' : 'Nog te doen'}
-                  </span>
-                </div>
-                <div style={{ fontSize: 12, color: T.muted, marginTop: 4, lineHeight: 1.5 }}>{s.desc}</div>
-              </div>
+      ) : (
+        <>
+          {/* Progress */}
+          <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '1.25rem', marginBottom: '1.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+              <span style={{ fontWeight: 600, fontSize: '0.9rem' }}>Voortgang aanleveren</span>
+              <span style={{ fontWeight: 700, color: pct === 100 ? '#22c55e' : ORANGE, fontSize: '1rem' }}>{done}/{SECTIONS.length} compleet</span>
+            </div>
+            <div style={{ background: '#f3f4f6', borderRadius: 999, height: 8 }}>
+              <div style={{ background: pct === 100 ? '#22c55e' : ORANGE, height: '100%', borderRadius: 999, width: pct + '%', transition: 'width 0.4s' }} />
             </div>
           </div>
-        ))}
-      </div>
 
-      <div style={{ marginTop: 20, padding: '14px 16px', background: T.bg, borderRadius: 7, border: `1px solid ${T.borderLight}`, fontSize: 12, color: T.muted, lineHeight: 1.6 }}>
-        Heb je niet alles of weet je iets niet zeker? Geen probleem — wij helpen je verder. Stuur een bericht via Support.
-      </div>
+          {/* Drive link */}
+          {record.drive_folder && (
+            <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: 14, padding: '1rem 1.25rem', marginBottom: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <p style={{ fontWeight: 600, fontSize: '0.875rem', color: '#111' }}>Google Drive map</p>
+                <p style={{ fontSize: '0.8rem', color: '#6b7280', marginTop: 2 }}>Upload hier je bestanden</p>
+              </div>
+              <a href={record.drive_folder} target="_blank" rel="noreferrer"
+                style={{ background: ORANGE, color: '#fff', padding: '0.5rem 1rem', borderRadius: 9, fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none' }}>
+                Drive openen
+              </a>
+            </div>
+          )}
+
+          {/* Checklist */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+            {SECTIONS.map(s => {
+              const checked = !!record[s.key]
+              return (
+                <div key={s.key}
+                  onClick={() => toggle(s.key)}
+                  style={{
+                    background: '#fff', border: `1px solid ${checked ? '#bbf7d0' : '#e5e7eb'}`,
+                    borderRadius: 12, padding: '1rem 1.25rem',
+                    display: 'flex', alignItems: 'center', gap: '1rem',
+                    cursor: 'pointer', transition: 'all 0.15s',
+                    opacity: saving === s.key ? 0.6 : 1,
+                  }}>
+                  <div style={{
+                    width: 22, height: 22, borderRadius: 6, flexShrink: 0,
+                    background: checked ? '#22c55e' : '#f3f4f6',
+                    border: `2px solid ${checked ? '#22c55e' : '#d1d5db'}`,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    transition: 'all 0.15s'
+                  }}>
+                    {checked && <span style={{ color: '#fff', fontSize: 13, lineHeight: 1 }}>✓</span>}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <p style={{ fontWeight: 600, fontSize: '0.9rem', color: checked ? '#6b7280' : '#111', textDecoration: checked ? 'line-through' : 'none' }}>{s.label}</p>
+                    <p style={{ fontSize: '0.8rem', color: '#9ca3af', marginTop: 1 }}>{s.desc}</p>
+                  </div>
+                  {checked && <span style={{ fontSize: '0.75rem', color: '#22c55e', fontWeight: 600, flexShrink: 0 }}>Aangeleverd</span>}
+                </div>
+              )
+            })}
+          </div>
+        </>
+      )}
     </div>
   )
 }
