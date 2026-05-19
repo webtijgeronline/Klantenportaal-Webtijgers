@@ -43,7 +43,7 @@ export default function LoginPage() {
           <img
             src="/mascotte-login.png"
             alt="Webtijger"
-            style={{ width: '100%', height: '100%', objectFit: 'contain', mixBlendMode: 'multiply' }}
+            style={{ width: '100%', height: '100%', objectFit: 'contain' }}
           />
         </div>
 
