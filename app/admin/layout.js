@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import Sidebar from '../../components/Sidebar'
 
 const ADMIN_NAV = [
-  { id: 'dashboard', label: 'Overzicht' },
+  { id: 'dashboard', label: 'Dashboard' },
   { id: 'clients', label: 'Klanten' },
   { id: 'projects', label: 'Projecten' },
   { id: 'invoices', label: 'Facturen' },
@@ -23,7 +23,7 @@ export default function AdminLayout({ children }) {
     const stored = localStorage.getItem('wt_user')
     if (!stored) { router.push('/login'); return }
     const parsed = JSON.parse(stored)
-    if (parsed.role !== 'admin') { router.push('/portal'); return }
+    if (parsed.role !== 'admin') { router.push('/portal/project'); return }
     setUser(parsed)
   }, [])
 
@@ -32,7 +32,7 @@ export default function AdminLayout({ children }) {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'DM Sans', sans-serif", background: '#f9fafb' }}>
       <Sidebar navItems={ADMIN_NAV} user={user} basePath="/admin" />
-      <main style={{ flex: 1, padding: '30px 34px', minWidth: 0, overflowX: 'hidden' }}>
+      <main style={{ flex: 1, minWidth: 0, overflowX: 'hidden' }}>
         {children}
       </main>
     </div>

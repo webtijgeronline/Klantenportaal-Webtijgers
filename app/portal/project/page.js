@@ -1,71 +1,105 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '../../../lib/supabase'
 
-const T = { ink: '#0a0a0a', muted: '#9ca3af', subtle: '#6b7280', border: '#e5e7eb', borderLight: '#f3f4f6', surface: '#fff', bg: '#f9fafb', blue: '#2563eb', green: '#16a34a', amber: '#d97706' }
+const ORANGE = '#f97316'
 
-const PROJECT_STATUS = {
-  in_development: { label: 'In ontwikkeling', dot: T.blue },
-  online: { label: 'Online', dot: T.green },
-  paused: { label: 'Gepauzeerd', dot: T.amber },
-  maintenance: { label: 'Onderhoud', dot: '#7c3aed' },
-}
+const statusLabel = { 'Not started': 'Niet gestart', 'In progress': 'In Ontwikkeling', 'On hold': 'On hold', 'Completed': 'Afgerond' }
+const statusColor = { 'Not started': '#6b7280', 'In progress': ORANGE, 'On hold': '#f59e0b', 'Completed': '#22c55e' }
+const progressMap = { 'Not started': 0, 'In progress': 60, 'On hold': 40, 'Completed': 100 }
 
 export default function PortalProject() {
-  const [projects, setProjects] = useState([])
+  const [project, setProject] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [clientName, setClientName] = useState('')
 
   useEffect(() => {
-    const stored = localStorage.getItem('wt_user')
-    if (!stored) return
-    const { email } = JSON.parse(stored)
-    supabase.from('projects').select('*').eq('client_email', email).then(({ data }) => {
-      setProjects(data || [])
-      setLoading(false)
-    })
+    const email = sessionStorage.getItem('clientEmail')
+    const user = localStorage.getItem('wt_user')
+    if (user) setClientName(JSON.parse(user).name || '')
+    if (email) fetchProject(email)
+    else setLoading(false)
   }, [])
 
-  if (loading) return <div style={{ color: T.muted, fontSize: 13 }}>Laden...</div>
+  async function fetchProject(email) {
+    const { data } = await supabase.from('projects').select('*').eq('client_email', email).order('created_at', { ascending: false }).limit(1).single()
+    setProject(data || null)
+    setLoading(false)
+  }
+
+  const progress = project ? (progressMap[project.status] ?? 60) : 0
+  const firstName = clientName?.split(' ')[0] || 'daar'
 
   return (
-    <div>
-      <div style={{ marginBottom: 26 }}>
-        <h2 style={{ margin: '0 0 3px', fontSize: 19, fontWeight: 600, color: T.ink, letterSpacing: '-0.4px' }}>Mijn project</h2>
-        <p style={{ margin: 0, fontSize: 13, color: T.muted }}>Bekijk de voortgang van jouw website.</p>
+    <div style={{ padding: '2rem', maxWidth: 760 }}>
+
+      {/* Welcome */}
+      <div style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, letterSpacing: '-0.5px', margin: 0 }}>Welkom terug, {firstName}</h1>
+        <p style={{ color: '#6b7280', marginTop: '0.3rem', fontSize: '0.95rem' }}>Hier is een overzicht van jouw project bij Webtijger.</p>
       </div>
 
-      {projects.length === 0
-        ? <div style={{ padding: '36px 0', textAlign: 'center', fontSize: 13, color: T.muted }}>Er zijn nog geen projecten voor jouw account.</div>
-        : projects.map(p => (
-          <div key={p.id} style={{ background: T.surface, borderRadius: 14, border: `1px solid ${T.border}`, padding: '24px 24px 20px', marginBottom: 14 }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16, marginBottom: 20 }}>
+      {loading ? (
+        <p style={{ color: '#6b7280' }}>Laden...</p>
+      ) : !project ? (
+        <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '2rem', textAlign: 'center' }}>
+          <p style={{ color: '#6b7280' }}>Er is nog geen project gekoppeld aan jouw account.</p>
+          <p style={{ color: '#9ca3af', fontSize: '0.85rem' }}>Neem contact op via <a href="mailto:info@webtijger.nl" style={{ color: ORANGE }}>info@webtijger.nl</a></p>
+        </div>
+      ) : (
+        <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, overflow: 'hidden' }}>
+
+          {/* Orange top accent */}
+          <div style={{ height: 4, background: ORANGE }} />
+
+          <div style={{ padding: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
               <div>
-                <div style={{ fontSize: 17, fontWeight: 600, color: T.ink, letterSpacing: '-0.3px', marginBottom: 4 }}>{p.name}</div>
-                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 12, color: T.subtle }}>
-                  <span style={{ width: 7, height: 7, borderRadius: '50%', background: PROJECT_STATUS[p.status]?.dot, display: 'inline-block' }} />
-                  {PROJECT_STATUS[p.status]?.label}
-                </span>
+                <h2 style={{ fontSize: '1.15rem', fontWeight: 700, margin: 0, letterSpacing: '-0.3px' }}>{project.name}</h2>
+                {project.description && <p style={{ color: '#6b7280', fontSize: '0.875rem', marginTop: '0.3rem' }}>{project.description}</p>}
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <div style={{ fontSize: 28, fontWeight: 600, color: T.ink, letterSpacing: '-1px' }}>{p.progress || 0}%</div>
-                <div style={{ fontSize: 11, color: T.muted }}>voltooid</div>
+              <span style={{ background: (statusColor[project.status] || '#6b7280') + '18', color: statusColor[project.status] || '#6b7280', padding: '4px 12px', borderRadius: 999, fontSize: '0.8rem', fontWeight: 600, whiteSpace: 'nowrap' }}>
+                {statusLabel[project.status] || project.status}
+              </span>
+            </div>
+
+            {project.deadline && (
+              <p style={{ fontSize: '0.85rem', color: '#6b7280', marginBottom: '1.25rem' }}>
+                Deadline: <strong style={{ color: '#374151' }}>{new Date(project.deadline).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' })}</strong>
+              </p>
+            )}
+
+            {/* Progress */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
+                <span style={{ fontSize: '0.85rem', color: '#6b7280', fontWeight: 500 }}>Voortgang</span>
+                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: ORANGE }}>{progress}%</span>
+              </div>
+              <div style={{ background: '#f3f4f6', borderRadius: 999, height: 8 }}>
+                <div style={{ background: ORANGE, height: '100%', borderRadius: 999, width: progress + '%', transition: 'width 0.5s ease' }} />
               </div>
             </div>
-            <div style={{ height: 6, background: T.borderLight, borderRadius: 99, overflow: 'hidden', marginBottom: 10 }}>
-              <div style={{ width: `${p.progress || 0}%`, height: '100%', background: p.progress === 100 ? T.green : T.blue, borderRadius: 99 }} />
-            </div>
-            <div style={{ fontSize: 11, color: T.muted, marginBottom: p.url || p.preview_url ? 16 : 0 }}>
-              Laatste update: {p.last_update ? new Date(p.last_update).toLocaleDateString('nl-NL', { day: 'numeric', month: 'long', year: 'numeric' }) : '—'}
-            </div>
-            {(p.url || p.preview_url) && (
-              <div style={{ display: 'flex', gap: 10, paddingTop: 16, borderTop: `1px solid ${T.borderLight}` }}>
-                {p.url && <a href={p.url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: T.blue, textDecoration: 'none', background: '#eff6ff', padding: '6px 14px', borderRadius: 7, border: '1px solid #bfdbfe', fontWeight: 500 }}>Live website bekijken</a>}
-                {p.preview_url && <a href={p.preview_url} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: T.subtle, textDecoration: 'none', background: T.bg, padding: '6px 14px', borderRadius: 7, border: `1px solid ${T.border}`, fontWeight: 500 }}>Preview bekijken</a>}
+
+            {project.phase && (
+              <div style={{ marginTop: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <span style={{ width: 8, height: 8, borderRadius: '50%', background: ORANGE, display: 'inline-block' }} />
+                <span style={{ fontSize: '0.875rem', color: '#374151' }}>Huidige fase: <strong>{project.phase}</strong></span>
               </div>
             )}
           </div>
-        ))
-      }
+        </div>
+      )}
+
+      {/* Contact card */}
+      <div style={{ marginTop: '1.5rem', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 14, padding: '1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div>
+          <p style={{ fontWeight: 600, fontSize: '0.9rem', margin: 0 }}>Vragen over je project?</p>
+          <p style={{ color: '#6b7280', fontSize: '0.825rem', marginTop: '0.2rem' }}>Webtijger helpt je graag verder.</p>
+        </div>
+        <a href="mailto:info@webtijger.nl" style={{ background: ORANGE, color: '#fff', padding: '0.5rem 1.1rem', borderRadius: 9, fontSize: '0.85rem', fontWeight: 600, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+          Contact
+        </a>
+      </div>
     </div>
   )
 }

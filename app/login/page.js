@@ -3,18 +3,12 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 
-const T = {
-  ink: '#0a0a0a', muted: '#9ca3af', subtle: '#6b7280',
-  border: '#e5e7eb', surface: '#ffffff', bg: '#f9fafb',
-  blue: '#2563eb', red: '#dc2626',
-  font: "'DM Sans', -apple-system, sans-serif",
-}
+const ORANGE = '#f97316'
 
 export default function LoginPage() {
   const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [showPass, setShowPass] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -24,105 +18,100 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      // Check if admin
       if (email === 'ryan@webtijger.nl' && password === 'admin') {
         localStorage.setItem('wt_user', JSON.stringify({ role: 'admin', name: 'Ryan', email }))
-        router.push('/admin')
+        router.push('/admin/dashboard')
         return
       }
 
-      // Check client credentials against Supabase
-      const { data, error: dbError } = await supabase
+      const { data, error: err } = await supabase
         .from('clients')
         .select('*')
         .eq('email', email)
-        .eq('password_plain', password)
+        .eq('password', password)
         .single()
 
-      if (dbError || !data) {
-        setError('Onbekend e-mailadres of onjuist wachtwoord.')
+      if (err || !data) {
+        setError('Onjuist e-mailadres of wachtwoord.')
         setLoading(false)
         return
       }
 
-      localStorage.setItem('wt_user', JSON.stringify({
-        role: 'client',
-        name: data.name,
-        email: data.email,
-      }))
-      router.push('/portal')
-    } catch (err) {
-      setError('Er ging iets mis. Probeer het opnieuw.')
+      localStorage.setItem('wt_user', JSON.stringify({ role: 'client', name: data.name, email: data.email }))
+      sessionStorage.setItem('clientEmail', data.email)
+      router.push('/portal/project')
+    } catch {
+      setError('Er is iets misgegaan. Probeer het opnieuw.')
       setLoading(false)
     }
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: T.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20, fontFamily: T.font }}>
-      <div style={{ width: '100%', maxWidth: 380 }}>
+    <div style={{ minHeight: '100vh', background: '#0f0f0f', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: "'DM Sans', -apple-system, sans-serif", padding: '1rem' }}>
+      <div style={{ width: '100%', maxWidth: 400 }}>
 
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 36 }}>
-          <div style={{ width: 46, height: 46, borderRadius: 13, background: T.ink, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 14px' }}>
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-              <path d="M12 3L3 7.5l9 4.5 9-4.5L12 3zM3 16.5l9 4.5 9-4.5M3 12l9 4.5 9-4.5" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        <div style={{ textAlign: 'center', marginBottom: '2.5rem' }}>
+          <div style={{ width: 52, height: 52, borderRadius: 14, background: ORANGE, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1rem' }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
+              <path d="M12 2C8 2 5 5 5 9c0 2 1 4 2.5 5.5L6 20h12l-1.5-5.5C18 13 19 11 19 9c0-4-3-7-7-7z" fill="white" opacity="0.9"/>
+              <circle cx="9.5" cy="9" r="1" fill="#0f0f0f"/>
+              <circle cx="14.5" cy="9" r="1" fill="#0f0f0f"/>
+              <path d="M10 13c0 0 1 1.5 2 1.5s2-1.5 2-1.5" stroke="#0f0f0f" strokeWidth="1.2" strokeLinecap="round"/>
             </svg>
           </div>
-          <div style={{ fontSize: 20, fontWeight: 600, color: T.ink, letterSpacing: '-0.4px' }}>Webtijger</div>
-          <div style={{ fontSize: 13, color: T.muted, marginTop: 4 }}>Meld je aan om verder te gaan</div>
+          <h1 style={{ color: '#ffffff', fontSize: '1.5rem', fontWeight: 700, margin: 0, letterSpacing: '-0.5px' }}>Webtijger</h1>
+          <p style={{ color: '#555', fontSize: '0.875rem', marginTop: '0.25rem' }}>Klantportaal</p>
         </div>
 
-        {/* Form */}
-        <div style={{ background: T.surface, borderRadius: 14, padding: '28px 28px 24px', border: `1px solid ${T.border}` }}>
+        {/* Card */}
+        <div style={{ background: '#161616', border: '1px solid #222', borderRadius: 16, padding: '2rem' }}>
+          <h2 style={{ color: '#fff', fontSize: '1.1rem', fontWeight: 600, marginBottom: '1.5rem', letterSpacing: '-0.3px' }}>Inloggen</h2>
+
           <form onSubmit={handleLogin}>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: T.subtle, marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-                E-mailadres
-              </label>
+            <div style={{ marginBottom: '1rem' }}>
+              <label style={{ display: 'block', color: '#888', fontSize: '0.8rem', marginBottom: '0.4rem', fontWeight: 500 }}>E-mailadres</label>
               <input
-                type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 placeholder="jouw@email.nl"
-                style={{ width: '100%', padding: '9px 12px', border: `1px solid ${T.border}`, borderRadius: 8, fontSize: 13, color: T.ink, outline: 'none', background: T.surface, boxSizing: 'border-box' }}
-                onFocus={e => e.target.style.borderColor = T.blue}
-                onBlur={e => e.target.style.borderColor = T.border}
+                required
+                style={{ width: '100%', padding: '0.65rem 0.875rem', background: '#1f1f1f', border: '1px solid #2a2a2a', borderRadius: 9, color: '#fff', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}
               />
             </div>
 
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ display: 'block', fontSize: 11, fontWeight: 500, color: T.subtle, marginBottom: 5, textTransform: 'uppercase', letterSpacing: '0.3px' }}>
-                Wachtwoord
-              </label>
-              <div style={{ position: 'relative' }}>
-                <input
-                  type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} required
-                  placeholder="••••••••"
-                  style={{ width: '100%', padding: '9px 42px 9px 12px', border: `1px solid ${T.border}`, borderRadius: 8, fontSize: 13, color: T.ink, outline: 'none', background: T.surface, boxSizing: 'border-box' }}
-                  onFocus={e => e.target.style.borderColor = T.blue}
-                  onBlur={e => e.target.style.borderColor = T.border}
-                />
-                <button type="button" onClick={() => setShowPass(s => !s)}
-                  style={{ position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: T.muted, fontFamily: T.font }}>
-                  {showPass ? 'Verberg' : 'Toon'}
-                </button>
-              </div>
+            <div style={{ marginBottom: '1.5rem' }}>
+              <label style={{ display: 'block', color: '#888', fontSize: '0.8rem', marginBottom: '0.4rem', fontWeight: 500 }}>Wachtwoord</label>
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                style={{ width: '100%', padding: '0.65rem 0.875rem', background: '#1f1f1f', border: '1px solid #2a2a2a', borderRadius: 9, color: '#fff', fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }}
+              />
             </div>
 
             {error && (
-              <div style={{ fontSize: 12, color: T.red, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 7, padding: '8px 12px', marginBottom: 14 }}>
+              <div style={{ background: '#2a1010', border: '1px solid #3d1515', borderRadius: 8, padding: '0.625rem 0.875rem', color: '#f87171', fontSize: '0.85rem', marginBottom: '1rem' }}>
                 {error}
               </div>
             )}
 
-            <button type="submit" disabled={loading}
-              style={{ width: '100%', padding: '10px 16px', background: T.ink, color: '#fff', border: 'none', borderRadius: 8, fontSize: 13, fontWeight: 500, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1, fontFamily: T.font, marginTop: 4 }}>
-              {loading ? 'Bezig...' : 'Inloggen'}
+            <button
+              type="submit"
+              disabled={loading}
+              style={{ width: '100%', background: ORANGE, color: '#fff', border: 'none', padding: '0.75rem', borderRadius: 9, fontSize: '0.95rem', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, fontFamily: 'inherit', letterSpacing: '-0.2px' }}>
+              {loading ? 'Inloggen...' : 'Inloggen'}
             </button>
           </form>
         </div>
 
-        <div style={{ marginTop: 14, fontSize: 12, color: T.muted, textAlign: 'center' }}>
-          Geen account? Neem contact op met Webtijger.
-        </div>
+        <p style={{ textAlign: 'center', color: '#333', fontSize: '0.8rem', marginTop: '1.5rem' }}>
+          Heb je geen account? Neem contact op via{' '}
+          <a href="mailto:info@webtijger.nl" style={{ color: ORANGE, textDecoration: 'none' }}>info@webtijger.nl</a>
+        </p>
       </div>
     </div>
   )
