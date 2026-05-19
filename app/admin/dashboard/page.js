@@ -68,10 +68,10 @@ export default function AdminDashboard() {
   if (loading) return <div style={{ color: T.muted, fontSize: 13 }}>Laden...</div>
 
   return (
-    <div>
+    <div style={{ padding: '2rem' }}>
       <div style={{ marginBottom: 26 }}>
-        <h2 style={{ margin: '0 0 3px', fontSize: 19, fontWeight: 600, color: T.ink, letterSpacing: '-0.4px' }}>Overzicht</h2>
-        <p style={{ margin: 0, fontSize: 13, color: T.muted }}>Welkom terug, Ryan.</p>
+        <h2 style={{ margin: '0 0 3px', fontSize: 28, fontWeight: 800, color: T.ink, letterSpacing: '-0.5px' }}>Overzicht</h2>
+        <p style={{ margin: 0, fontSize: 14, color: T.muted }}>Welkom terug, Ryan.</p>
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5,1fr)', gap: 10, marginBottom: 24 }}>

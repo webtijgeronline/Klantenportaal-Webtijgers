@@ -5,7 +5,6 @@ import { supabase } from '../../lib/supabase'
 import Image from 'next/image'
 
 const ORANGE = '#f97316'
-const BEIGE = '#d1c3aa'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -35,64 +34,51 @@ export default function LoginPage() {
     }
   }
 
-  const inputStyle = {
-    width: '100%', padding: '0.65rem 0.875rem',
-    background: '#fff', border: '1px solid #e5e7eb',
-    borderRadius: 9, color: '#111', fontSize: '0.9rem',
-    outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit'
-  }
-
   return (
-    <div style={{ minHeight: '100vh', background: '#faf9f7', display: 'flex', fontFamily: "'DM Sans', -apple-system, sans-serif" }}>
+    <div style={{ minHeight: '100vh', background: '#faf9f7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
+      <div style={{ width: '100%', maxWidth: 420, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-      {/* Left: branding panel */}
-      <div style={{ display: 'none', flex: 1, background: '#0f0f0f', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3rem', '@media(minWidth:768px)': { display: 'flex' } }}
-        className="login-left">
-        <Image src="/logo.png" alt="Webtijger" width={200} height={75} style={{ objectFit: 'contain', marginBottom: '2rem' }} />
-        <Image src="/mascotte.png" alt="Webtijger mascotte" width={320} height={320} style={{ objectFit: 'contain' }} />
-        <p style={{ color: '#555', fontSize: '0.9rem', textAlign: 'center', marginTop: '1.5rem', maxWidth: 260, lineHeight: 1.6 }}>
-          Jouw persoonlijke portaal voor projectupdates, bestanden en meer.
-        </p>
-      </div>
+        {/* Mascotte + logo */}
+        <div style={{ position: 'relative', marginBottom: '0.5rem' }}>
+          <Image src="/mascotte.png" alt="Webtijger mascotte" width={140} height={140} style={{ objectFit: 'contain', filter: 'drop-shadow(0 8px 24px rgba(249,115,22,0.2))' }} />
+        </div>
+        <Image src="/logo-transparent.png" alt="Webtijger" width={160} height={52} style={{ objectFit: 'contain', marginBottom: '0.25rem' }} />
+        <p style={{ color: '#9ca3af', fontSize: '0.85rem', marginBottom: '2rem' }}>Klantportaal</p>
 
-      {/* Right: login form */}
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-        <div style={{ width: '100%', maxWidth: 380 }}>
-
-          {/* Mobile logo */}
-          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-            <Image src="/logo.png" alt="Webtijger" width={160} height={60} style={{ objectFit: 'contain' }} />
-          </div>
-
-          <h2 style={{ fontSize: '1.4rem', fontWeight: 700, letterSpacing: '-0.4px', marginBottom: '0.3rem', color: '#111' }}>Welkom terug</h2>
-          <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.75rem' }}>Log in op je Webtijger klantportaal</p>
+        {/* Card */}
+        <div style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 18, padding: '2rem', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
+          <h2 style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.5px', marginBottom: '0.25rem' }}>Welkom terug</h2>
+          <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>Log in op je persoonlijke portaal</p>
 
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', color: '#374151', fontSize: '0.82rem', fontWeight: 600, marginBottom: '0.4rem' }}>E-mailadres</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jouw@email.nl" required style={inputStyle} />
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem', letterSpacing: '0.01em' }}>E-mailadres</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jouw@email.nl" required
+                style={{ width: '100%', padding: '0.7rem 0.9rem', background: '#faf9f7', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', color: '#111' }} />
             </div>
             <div style={{ marginBottom: '1.5rem' }}>
-              <label style={{ display: 'block', color: '#374151', fontSize: '0.82rem', fontWeight: 600, marginBottom: '0.4rem' }}>Wachtwoord</label>
-              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required style={inputStyle} />
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem' }}>Wachtwoord</label>
+              <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required
+                style={{ width: '100%', padding: '0.7rem 0.9rem', background: '#faf9f7', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', color: '#111' }} />
             </div>
 
             {error && (
-              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 8, padding: '0.625rem 0.875rem', color: '#dc2626', fontSize: '0.85rem', marginBottom: '1rem' }}>
+              <div style={{ background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 9, padding: '0.6rem 0.875rem', color: '#dc2626', fontSize: '0.85rem', marginBottom: '1rem' }}>
                 {error}
               </div>
             )}
 
-            <button type="submit" disabled={loading} style={{ width: '100%', background: ORANGE, color: '#fff', border: 'none', padding: '0.75rem', borderRadius: 9, fontSize: '0.95rem', fontWeight: 700, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, fontFamily: 'inherit', letterSpacing: '-0.2px' }}>
-              {loading ? 'Inloggen...' : 'Inloggen'}
+            <button type="submit" disabled={loading}
+              style={{ width: '100%', background: ORANGE, color: '#fff', border: 'none', padding: '0.8rem', borderRadius: 10, fontSize: '0.95rem', fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, fontFamily: 'inherit', letterSpacing: '-0.2px' }}>
+              {loading ? 'Inloggen...' : 'Inloggen →'}
             </button>
           </form>
-
-          <p style={{ textAlign: 'center', color: '#9ca3af', fontSize: '0.8rem', marginTop: '1.5rem' }}>
-            Geen account?{' '}
-            <a href="mailto:info@webtijger.nl" style={{ color: ORANGE, textDecoration: 'none', fontWeight: 600 }}>Neem contact op</a>
-          </p>
         </div>
+
+        <p style={{ color: '#b0b0b0', fontSize: '0.8rem', marginTop: '1.25rem', textAlign: 'center' }}>
+          Geen account?{' '}
+          <a href="mailto:info@webtijger.nl" style={{ color: ORANGE, textDecoration: 'none', fontWeight: 700 }}>Mail ons</a>
+        </p>
       </div>
     </div>
   )

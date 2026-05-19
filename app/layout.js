@@ -1,8 +1,8 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'Webtijger CRM',
-  description: 'Klantportaal & CRM voor Webtijger',
+  title: 'Webtijger Klantportaal',
+  description: 'Jouw persoonlijke portaal bij Webtijger',
 }
 
 export default function RootLayout({ children }) {
