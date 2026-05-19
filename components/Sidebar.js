@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation'
 import Image from 'next/image'
 
 const ORANGE = '#f97316'
+const BEIGE = '#d1c3aa'
 
 export default function Sidebar({ navItems, user, basePath }) {
   const pathname = usePathname()
@@ -17,17 +18,17 @@ export default function Sidebar({ navItems, user, basePath }) {
   }
 
   return (
-    <aside style={{ width: 224, background: '#0f0f0f', display: 'flex', flexDirection: 'column', flexShrink: 0, position: 'sticky', top: 0, height: '100vh', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+    <aside style={{ width: 224, background: BEIGE, display: 'flex', flexDirection: 'column', flexShrink: 0, position: 'sticky', top: 0, height: '100vh', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
 
       {/* Logo */}
       <div style={{ padding: '20px 18px 14px' }}>
-        <Image src="/logo-transparent.png" alt="Webtijger" width={130} height={48} style={{ objectFit: 'contain', objectPosition: 'left', filter: 'brightness(0) invert(1)' }} />
-        <div style={{ color: '#555', fontSize: 10, letterSpacing: '0.8px', textTransform: 'uppercase', marginTop: 6 }}>
+        <Image src="/logo-transparent.png" alt="Webtijger" width={130} height={48} style={{ objectFit: 'contain', objectPosition: 'left' }} />
+        <div style={{ color: '#8a7a66', fontSize: 10, letterSpacing: '0.8px', textTransform: 'uppercase', marginTop: 6 }}>
           {basePath === '/admin' ? 'Beheerder' : 'Klantportaal'}
         </div>
       </div>
 
-      <div style={{ height: 1, background: '#1e1e1e', margin: '0 0 6px' }} />
+      <div style={{ height: 1, background: '#c4b49a', margin: '0 0 6px' }} />
 
       {/* Nav */}
       <nav style={{ flex: 1, padding: '4px 10px', overflowY: 'auto' }}>
@@ -39,9 +40,9 @@ export default function Sidebar({ navItems, user, basePath }) {
                 display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                 padding: '8px 12px', borderRadius: 8, marginBottom: 2,
                 background: active ? ORANGE : 'transparent',
-                color: active ? '#ffffff' : '#aaaaaa',
-                fontSize: 13.5, fontWeight: active ? 700 : 400,
-                textDecoration: 'none', letterSpacing: '-0.1px',
+                color: active ? '#ffffff' : '#5a4a38',
+                fontSize: 13.5, fontWeight: active ? 700 : 500,
+                textDecoration: 'none',
               }}>
               {item.label}
               {item.badge > 0 && (
@@ -53,18 +54,18 @@ export default function Sidebar({ navItems, user, basePath }) {
       </nav>
 
       {/* User */}
-      <div style={{ padding: '12px 14px', borderTop: '1px solid #1e1e1e' }}>
+      <div style={{ padding: '12px 14px', borderTop: '1px solid #c4b49a' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
-          <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#1c1c1c', border: '1px solid #2a2a2a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: ORANGE, flexShrink: 0 }}>
+          <div style={{ width: 30, height: 30, borderRadius: '50%', background: '#c4b49a', border: '1.5px solid #b0a090', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 800, color: '#5a4a38', flexShrink: 0 }}>
             {(user?.name || user?.email || 'U').slice(0, 1).toUpperCase()}
           </div>
           <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ color: '#ffffff', fontSize: 12, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name || 'Gebruiker'}</div>
-            <div style={{ color: '#555', fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email || ''}</div>
+            <div style={{ color: '#2a1f14', fontSize: 12, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.name || 'Gebruiker'}</div>
+            <div style={{ color: '#8a7a66', fontSize: 10, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user?.email || ''}</div>
           </div>
         </div>
         <button onClick={logout}
-          style={{ marginTop: 10, width: '100%', background: '#1a1a1a', border: '1px solid #2a2a2a', cursor: 'pointer', color: '#888', fontSize: 12, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: '7px', borderRadius: 7 }}>
+          style={{ marginTop: 10, width: '100%', background: '#c4b49a', border: '1px solid #b0a090', cursor: 'pointer', color: '#5a4a38', fontSize: 12, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: '7px', borderRadius: 7, fontWeight: 600 }}>
           Uitloggen
         </button>
       </div>

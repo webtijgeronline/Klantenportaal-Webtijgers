@@ -36,14 +36,16 @@ export default function LoginPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#faf9f7', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem', fontFamily: "'Plus Jakarta Sans', -apple-system, sans-serif" }}>
-      <div style={{ width: '100%', maxWidth: 420, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <div style={{ width: '100%', maxWidth: 400, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-        {/* Mascotte + logo */}
-        <div style={{ position: 'relative', marginBottom: '0.5rem' }}>
-          <Image src="/mascotte.png" alt="Webtijger mascotte" width={140} height={140} style={{ objectFit: 'contain', filter: 'drop-shadow(0 8px 24px rgba(249,115,22,0.2))' }} />
-        </div>
-        <Image src="/logo-transparent.png" alt="Webtijger" width={160} height={52} style={{ objectFit: 'contain', marginBottom: '0.25rem' }} />
-        <p style={{ color: '#9ca3af', fontSize: '0.85rem', marginBottom: '2rem' }}>Klantportaal</p>
+        {/* Mascotte only */}
+        <Image
+          src="/mascotte.png"
+          alt="Webtijger"
+          width={150}
+          height={150}
+          style={{ objectFit: 'contain', filter: 'drop-shadow(0 8px 24px rgba(249,115,22,0.2))', marginBottom: '1.5rem' }}
+        />
 
         {/* Card */}
         <div style={{ width: '100%', background: '#fff', border: '1px solid #e5e7eb', borderRadius: 18, padding: '2rem', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
@@ -52,14 +54,14 @@ export default function LoginPage() {
 
           <form onSubmit={handleLogin}>
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem', letterSpacing: '0.01em' }}>E-mailadres</label>
+              <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem' }}>E-mailadres</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="jouw@email.nl" required
-                style={{ width: '100%', padding: '0.7rem 0.9rem', background: '#faf9f7', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', color: '#111' }} />
+                style={{ width: '100%', padding: '0.7rem 0.9rem', background: '#faf9f7', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
             </div>
             <div style={{ marginBottom: '1.5rem' }}>
               <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 700, color: '#374151', marginBottom: '0.4rem' }}>Wachtwoord</label>
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" required
-                style={{ width: '100%', padding: '0.7rem 0.9rem', background: '#faf9f7', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit', color: '#111' }} />
+                style={{ width: '100%', padding: '0.7rem 0.9rem', background: '#faf9f7', border: '1.5px solid #e5e7eb', borderRadius: 10, fontSize: '0.9rem', outline: 'none', boxSizing: 'border-box', fontFamily: 'inherit' }} />
             </div>
 
             {error && (
@@ -69,13 +71,13 @@ export default function LoginPage() {
             )}
 
             <button type="submit" disabled={loading}
-              style={{ width: '100%', background: ORANGE, color: '#fff', border: 'none', padding: '0.8rem', borderRadius: 10, fontSize: '0.95rem', fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, fontFamily: 'inherit', letterSpacing: '-0.2px' }}>
+              style={{ width: '100%', background: ORANGE, color: '#fff', border: 'none', padding: '0.8rem', borderRadius: 10, fontSize: '0.95rem', fontWeight: 800, cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.7 : 1, fontFamily: 'inherit' }}>
               {loading ? 'Inloggen...' : 'Inloggen →'}
             </button>
           </form>
         </div>
 
-        <p style={{ color: '#b0b0b0', fontSize: '0.8rem', marginTop: '1.25rem', textAlign: 'center' }}>
+        <p style={{ color: '#b0b0b0', fontSize: '0.8rem', marginTop: '1.25rem' }}>
           Geen account?{' '}
           <a href="mailto:info@webtijger.nl" style={{ color: ORANGE, textDecoration: 'none', fontWeight: 700 }}>Mail ons</a>
         </p>

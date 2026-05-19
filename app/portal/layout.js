@@ -6,6 +6,7 @@ import Sidebar from '../../components/Sidebar'
 const PORTAL_NAV = [
   { id: 'project', label: 'Mijn project' },
   { id: 'aanleveren', label: 'Aanleveren' },
+  { id: 'invoices', label: 'Facturen' },
   { id: 'contracts', label: 'Overeenkomst' },
   { id: 'files', label: 'Bestanden' },
   { id: 'support', label: 'Support' },
@@ -28,7 +29,7 @@ export default function PortalLayout({ children }) {
   if (!user) return null
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'DM Sans', sans-serif", background: '#faf9f7' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', fontFamily: "'Plus Jakarta Sans', sans-serif", background: '#faf9f7' }}>
       <Sidebar navItems={PORTAL_NAV} user={user} basePath="/portal" />
       <main style={{ flex: 1, minWidth: 0, overflowX: 'hidden' }}>
         {children}
